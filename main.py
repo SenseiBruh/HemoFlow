@@ -151,7 +151,8 @@ def plot_velocity_field(
         x * 1000,
         radius_x * 1000,
         color="black",
-        linewidth=2
+        linewidth=2,
+        zorder=11
     )
 
     plt.plot(
@@ -182,17 +183,46 @@ def animate_particles(
     local_mean_velocity,
     reynolds_number,
     flow_regime,
+    heart_rate,
+    pulsatility_percent,
     number_of_particles=120
 ):
     fig, ax = plt.subplots(figsize=(12, 4))
 
+    # Heartbeat parameters
+    frequency = heart_rate / 60.0
+    pulsatility = pulsatility_percent / 100.0
+
+    # Keep pulsatility in a reasonable range for this simplified model
+    pulsatility = np.clip(pulsatility, 0.0, 0.95)
+
     # Draw the velocity heatmap
+    max_display_velocity = (
+    np.max(velocity)
+    * (1 + pulsatility)
+    )
+
     heatmap = ax.pcolormesh(
-        X * 1000,
-        Y * 1000,
-        velocity,
-        shading="auto",
-        cmap="coolwarm"
+    X * 1000,
+    Y * 1000,
+    velocity,
+    shading="auto",
+    cmap="coolwarm",
+    vmin=0,
+    vmax=max_display_velocity
+    )
+    
+    status_text = ax.text(
+    0.02,
+    0.95,
+    "",
+    transform=ax.transAxes,
+    verticalalignment="top",
+    bbox=dict(
+        boxstyle="round",
+        facecolor="white",
+        alpha=0.8
+    )
     )
 
     fig.colorbar(
@@ -249,10 +279,13 @@ def animate_particles(
     )
 
     particles = ax.scatter(
-        particle_x * 1000,
-        particle_y * 1000,
-        s=12,
-        color="black"
+    particle_x * 1000,
+    particle_y * 1000,
+    s=28,
+    facecolor="white",
+    edgecolor="black",
+    linewidth=0.7,
+    zorder=10
     )
 
     ax.set_xlabel(
@@ -270,7 +303,7 @@ def animate_particles(
     )
 
     # Simulation timestep
-    dt = 0.001
+    dt = 0.005
 
     # ------------------------------------
     # Animation update function
@@ -280,27 +313,59 @@ def animate_particles(
         nonlocal particle_x
         nonlocal particle_eta
 
-        # Find local mean velocity
-        # at each particle position
+                # Simulation time
+        time = frame * dt
+
+        # Simple pulsatile heartbeat
+        pulse_factor = (
+            1
+            + pulsatility
+            * np.sin(
+                2
+                * np.pi
+                * frequency
+                * time
+            )
+        )
+
+        # --------------------------------
+        # Update heatmap
+        # --------------------------------
+
+        current_velocity_field = (
+            velocity * pulse_factor
+        )
+
+        heatmap.set_array(
+            current_velocity_field.ravel()
+        )
+
+        # --------------------------------
+        # Update particles
+        # --------------------------------
+
         mean_u = np.interp(
             particle_x,
             x,
             local_mean_velocity
         )
 
-        # Locally parabolic velocity profile
+        # Apply heartbeat
+        mean_u = mean_u * pulse_factor
+
+        # Local parabolic velocity profile
         particle_velocity = (
             2
             * mean_u
             * (1 - particle_eta**2)
         )
 
-        # Move particles downstream
+        # Move particles
         particle_x += (
             particle_velocity * dt
         )
 
-        # Recycle particles that leave vessel
+        # Recycle particles leaving vessel
         exited = particle_x > x[-1]
 
         number_exited = np.sum(exited)
@@ -316,16 +381,16 @@ def animate_particles(
                 )
             )
 
-        # Find vessel radius at new x positions
+        # Make particles follow vessel geometry
         local_radius = np.interp(
             particle_x,
             x,
             radius_x
         )
 
-        # Make particles follow vessel geometry
         particle_y = (
-            particle_eta * local_radius
+            particle_eta
+            * local_radius
         )
 
         particles.set_offsets(
@@ -337,14 +402,34 @@ def animate_particles(
             )
         )
 
-        return particles,
+        # --------------------------------
+        # Update status text
+        # --------------------------------
+
+        inlet_velocity = (
+            local_mean_velocity[0]
+            * pulse_factor
+        )
+
+        status_text.set_text(
+            f"Time: {time:.2f} s\n"
+            f"Heart Rate: {heart_rate:.0f} BPM\n"
+            f"Inlet Mean Velocity: "
+            f"{inlet_velocity:.3f} m/s"
+        )
+
+        return (
+            particles,
+            heatmap,
+            status_text
+        )
 
     animation = FuncAnimation(
-        fig,
-        update,
-        interval=20,
-        blit=True,
-        cache_frame_data=False
+    fig,
+    update,
+    interval=20,
+    blit=False,
+    cache_frame_data=False
     )
 
     plt.tight_layout()
@@ -388,6 +473,14 @@ def main():
     stenosis_length_mm = float(
     input("Stenosis length (mm) [15]: ") or 15
     )
+
+    heart_rate = float(
+    input("Heart rate (BPM) [72]: ") or 72
+    )
+
+    pulsatility_percent = float(
+    input("Pulsatility (%) [40]: ") or 40
+    ) #means the instantaneous flow oscillates approximately ±40% around the mean
 
     # Convert mm -> meters (Reynolds Number equation assumes consistent SI units, so converting)
     diameter = diameter_mm / 1000
@@ -456,7 +549,9 @@ def main():
     radius_x,
     local_mean_velocity,
     reynolds_number,
-    flow_regime
+    flow_regime,
+    heart_rate,
+    pulsatility_percent
     )
 
     maximum_velocity = np.max(velocity)
