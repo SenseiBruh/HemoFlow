@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+from matplotlib.animation import FuncAnimation
 
 def calculate_reynolds_number(density, velocity, diameter, viscosity):
     return density * velocity * diameter / viscosity
@@ -173,6 +173,184 @@ def plot_velocity_field(
     plt.tight_layout()
     plt.show()
 
+def animate_particles(
+    X,
+    Y,
+    velocity,
+    x,
+    radius_x,
+    local_mean_velocity,
+    reynolds_number,
+    flow_regime,
+    number_of_particles=120
+):
+    fig, ax = plt.subplots(figsize=(12, 4))
+
+    # Draw the velocity heatmap
+    heatmap = ax.pcolormesh(
+        X * 1000,
+        Y * 1000,
+        velocity,
+        shading="auto",
+        cmap="coolwarm"
+    )
+
+    fig.colorbar(
+        heatmap,
+        ax=ax,
+        label="Blood Velocity (m/s)"
+    )
+
+    # Draw vessel walls
+    ax.plot(
+        x * 1000,
+        radius_x * 1000,
+        color="black",
+        linewidth=2
+    )
+
+    ax.plot(
+        x * 1000,
+        -radius_x * 1000,
+        color="black",
+        linewidth=2
+    )
+
+    # ------------------------------------
+    # Create particles
+    # ------------------------------------
+
+    rng = np.random.default_rng(42)
+
+    particle_x = rng.uniform(
+        x[0],
+        x[-1],
+        number_of_particles
+    )
+
+    # Normalized vertical position inside vessel
+    # -1 = bottom wall
+    #  0 = center
+    # +1 = top wall
+    particle_eta = rng.uniform(
+        -0.85,
+        0.85,
+        number_of_particles
+    )
+
+    local_radius = np.interp(
+        particle_x,
+        x,
+        radius_x
+    )
+
+    particle_y = (
+        particle_eta * local_radius
+    )
+
+    particles = ax.scatter(
+        particle_x * 1000,
+        particle_y * 1000,
+        s=12,
+        color="black"
+    )
+
+    ax.set_xlabel(
+        "Distance Along Vessel (mm)"
+    )
+
+    ax.set_ylabel(
+        "Radial Position (mm)"
+    )
+
+    ax.set_title(
+        f"Animated Blood Flow | "
+        f"Re = {reynolds_number:.0f} | "
+        f"{flow_regime}"
+    )
+
+    # Simulation timestep
+    dt = 0.001
+
+    # ------------------------------------
+    # Animation update function
+    # ------------------------------------
+
+    def update(frame):
+        nonlocal particle_x
+        nonlocal particle_eta
+
+        # Find local mean velocity
+        # at each particle position
+        mean_u = np.interp(
+            particle_x,
+            x,
+            local_mean_velocity
+        )
+
+        # Locally parabolic velocity profile
+        particle_velocity = (
+            2
+            * mean_u
+            * (1 - particle_eta**2)
+        )
+
+        # Move particles downstream
+        particle_x += (
+            particle_velocity * dt
+        )
+
+        # Recycle particles that leave vessel
+        exited = particle_x > x[-1]
+
+        number_exited = np.sum(exited)
+
+        if number_exited > 0:
+            particle_x[exited] = x[0]
+
+            particle_eta[exited] = (
+                rng.uniform(
+                    -0.85,
+                    0.85,
+                    number_exited
+                )
+            )
+
+        # Find vessel radius at new x positions
+        local_radius = np.interp(
+            particle_x,
+            x,
+            radius_x
+        )
+
+        # Make particles follow vessel geometry
+        particle_y = (
+            particle_eta * local_radius
+        )
+
+        particles.set_offsets(
+            np.column_stack(
+                (
+                    particle_x * 1000,
+                    particle_y * 1000
+                )
+            )
+        )
+
+        return particles,
+
+    animation = FuncAnimation(
+        fig,
+        update,
+        interval=20,
+        blit=True,
+        cache_frame_data=False
+    )
+
+    plt.tight_layout()
+    plt.show()
+
+    return animation
 
 def main():
     print("\n--- HemoFlow ---")
@@ -260,15 +438,27 @@ def main():
     stenosis_length
     )
 
-    plot_velocity_field(
+    #plot_velocity_field(
+    #X,
+    #Y,
+    #velocity,
+    #x,
+    #radius_x,
+    #reynolds_number,
+    #flow_regime
+    #)
+    
+    animation = animate_particles(
     X,
     Y,
     velocity,
     x,
     radius_x,
+    local_mean_velocity,
     reynolds_number,
     flow_regime
     )
+
     maximum_velocity = np.max(velocity)
     print(
     f"Maximum Local Velocity: "
