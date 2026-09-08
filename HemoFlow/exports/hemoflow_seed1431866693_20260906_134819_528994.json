@@ -1,0 +1,60 @@
+{
+  "density": 1060.0,
+  "viscosity": 0.0035,
+  "diameter_mm": 4.0,
+  "length_mm": 60.0,
+  "mean_velocity": 0.3,
+  "stenosis_percent": 50.0,
+  "stenosis_center_mm": 30.0,
+  "stenosis_length_mm": 15.0,
+  "heart_rate": 72.0,
+  "pulsatility_percent": 40.0,
+  "plaque_count": 4,
+  "seed": 1431866693,
+  "geometry_mode": "custom",
+  "cells_across": 40,
+  "particle_count": 1000,
+  "pulse_shape": "systolic",
+  "randomize_count": false,
+  "max_random_plaques": 2,
+  "randomize_on_launch": true,
+  "plaques": [
+    {
+      "id": 1,
+      "center_mm": 35.65553415337481,
+      "length_mm": 18.686637129408062,
+      "severity_percent": 23.363989334961524,
+      "wall": "top",
+      "asymmetry": 0.4820661561125899,
+      "shape_exponent": 1.1033903943462509
+    },
+    {
+      "id": 2,
+      "center_mm": 29.434969325153382,
+      "length_mm": 18.25,
+      "severity_percent": 70.3501683501684,
+      "wall": "bottom",
+      "asymmetry": 0.55,
+      "shape_exponent": 1.15
+    },
+    {
+      "id": 3,
+      "center_mm": 25.006288343558293,
+      "length_mm": 6.75,
+      "severity_percent": 83.01346801346799,
+      "wall": "bottom",
+      "asymmetry": 0.55,
+      "shape_exponent": 1.15
+    },
+    {
+      "id": 4,
+      "center_mm": 36.30805214723927,
+      "length_mm": 6.75,
+      "severity_percent": 46.21212121212121,
+      "wall": "bottom",
+      "asymmetry": 0.55,
+      "shape_exponent": 1.15
+    }
+  ],
+  "compute_threads": 0
+}

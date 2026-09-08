@@ -1,0 +1,5 @@
+HemoFlow 3.0.0
+
+This release extends the continuous v2 laboratory with explicit stenosis
+measurement labels, one-way particle property sweeps, fixed-BPM controls,
+particle visibility/performance controls, and unattended time-series recording.

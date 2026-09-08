@@ -1,0 +1,44 @@
+{
+  "delta_p": 47.737736131603036,
+  "max_velocity": 0.4511606112747754,
+  "min_u": 0.011125417474922798,
+  "backflow_percent": 0.0,
+  "mach": 0.11721496516526146,
+  "density_variation": 0.003045627753273994,
+  "flux_error": -0.002938489528179853,
+  "pulse_factor": 1.0,
+  "phase": "STEADY FLOW",
+  "inlet_speed": 0.3,
+  "max_wss": 1.565033981720182,
+  "mean_abs_wss": 1.5612100160676465,
+  "max_vorticity": 435.20724543200686,
+  "womersley": 3.022243577350619,
+  "particle_relaxation_time_s": 1.0768253968253968e-06,
+  "particle_stokes_number": 8.119072214077393e-06,
+  "time_s": 5.0000025,
+  "steps": 666667,
+  "dt_s": 7.5e-06,
+  "elapsed_s": 1268.0260971999996,
+  "grid": [
+    1201,
+    82
+  ],
+  "stopped_by_user": false,
+  "particle_model": "tracer",
+  "particle_diameter_um": 8.0,
+  "particle_density_kg_m3": 1060.0,
+  "geometry_report": {
+    "model": "2D planar rasterized lumen; area value is a circular-3D equivalent",
+    "nominal_diameter_mm": 4.0,
+    "grid_spacing_mm": 0.05,
+    "overall_minimum_lumen_mm": 4.0,
+    "overall_realized_raster_diameter_narrowing_percent": 0.0,
+    "overall_equivalent_circular_3d_area_reduction_percent": 0.0,
+    "plaques": []
+  },
+  "recording": {
+    "timeseries_csv": "experiments\\healthy_steady_N080_001\\raw\\hemoflow_run_20260907T234729_840581Z_timeseries.csv",
+    "metadata_json": "experiments\\healthy_steady_N080_001\\raw\\hemoflow_run_20260907T234729_840581Z_metadata.json",
+    "epochs_jsonl": "experiments\\healthy_steady_N080_001\\raw\\hemoflow_run_20260907T234729_840581Z_epochs.jsonl"
+  }
+}

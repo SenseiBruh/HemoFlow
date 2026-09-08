@@ -1,0 +1,11 @@
+{
+  "pressure_drop_pa": 4.173742314541725,
+  "analytic_pressure_drop_pa": 4.134375,
+  "pressure_relative_error_percent": 0.9521950607219942,
+  "wall_shear_pa": 0.5110797255009044,
+  "analytic_wall_shear_pa": 0.525,
+  "wall_shear_relative_error_percent": 2.6514808569705894,
+  "velocity_profile_relative_l2_percent": 0.07710624233431948,
+  "flux_mismatch_percent": 0.2761481465980805,
+  "backflow_percent": 0.0
+}

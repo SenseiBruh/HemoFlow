@@ -1,0 +1,14 @@
+{
+  "pause_resume": true,
+  "map_toggle": true,
+  "pulse_toggle": true,
+  "plaque_select_drag_move": true,
+  "plaque_height_handle": true,
+  "plaque_add_delete": true,
+  "injection": true,
+  "snapshot_exports": true,
+  "settings_roundtrip": true,
+  "regeneration": true,
+  "bounded_snapshot_ring": true,
+  "figure_axes_after_resets": 20
+}
