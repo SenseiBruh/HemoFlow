@@ -1,0 +1,25 @@
+{
+  "unit_tests_passed": 8,
+  "manufactured_pipeline_checks": [
+    "matching_affine_fields_accepted",
+    "far_wall_fault_rejected",
+    "wave_speed_mismatch_rejected"
+  ],
+  "smoke_cases_completed": [
+    "healthy_N080",
+    "healthy_N120",
+    "severe_N080",
+    "severe_N120",
+    "healthy_N160",
+    "severe_N160"
+  ],
+  "smoke_duration_s": 0.002,
+  "smoke_threads": 2,
+  "actual_smoke_field_region_phase_comparisons": 20,
+  "resume_reused_cases": 6,
+  "resume_started_new_cases": false,
+  "exports_integrity_checked": 4,
+  "frozen_solver_files_verified": 17,
+  "windows_launcher": "Reviewed only; execution tests used Python on Linux",
+  "scientific_verdict": "Not established by smoke/manufactured tests. Full cases must run on the user PC."
+}

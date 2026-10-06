@@ -1,0 +1,8 @@
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.png binary
+*.pdf binary
+
+# Study receipts depend on byte-exact source hashes, including line endings.
+studies/** -text

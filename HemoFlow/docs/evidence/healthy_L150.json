@@ -1,0 +1,95 @@
+{
+  "kind": "healthy",
+  "initialization": "native",
+  "complete": true,
+  "basic_pass": true,
+  "maxima": {
+    "mach": 0.023385769286885575,
+    "density_departure_percent": 0.030686861564777068,
+    "mass_residual_relative": 1.6498483113076572e-12
+  },
+  "smoke_only": false,
+  "solver_validated": false,
+  "convergence_assessed": false,
+  "jet_history": {
+    "threshold_mm": 0.05,
+    "definition": "Forward axial-velocity-squared weighted centroid; threshold crossings are diagnostics, not a physical instability criterion.",
+    "samples": 8321,
+    "last_time_s": 2.000001,
+    "events": {
+      "x020_forward_centroid_y_mm": [],
+      "x030_forward_centroid_y_mm": [],
+      "x035_forward_centroid_y_mm": [],
+      "x040_forward_centroid_y_mm": [],
+      "x045_forward_centroid_y_mm": [],
+      "x050_forward_centroid_y_mm": [],
+      "x055_forward_centroid_y_mm": []
+    },
+    "sampling_caveat": "Events detected at recorded samples, not exact crossing times. Previously completed runs can have fewer stations and startup fields."
+  },
+  "fixed_radius_fits": {
+    "radii_mm": [
+      0.2,
+      0.25
+    ],
+    "rows": 12212,
+    "invalid_rows": 0,
+    "interpretation": "Measurement diagnostic only; does not change solver or original acceptance scores.",
+    "max_wall_velocity_residual_m_s": 7.204542502690806e-05,
+    "final_healthy_rms_error_percent": {
+      "0.2": 0.03191442082877354,
+      "0.25": 0.0319031627335332
+    }
+  },
+  "notes": "Thresholds are diagnostic resolutions, not instability criteria. No filtering. Positive inlet skew intentionally breaks symmetry.",
+  "healthy_gate_pass": true,
+  "healthy_benchmark": {
+    "complete": true,
+    "gate_pass": true,
+    "smoke_only": false,
+    "solver_validated": false,
+    "maxima": {
+      "mach": 0.023385769286885575,
+      "density_departure_percent": 0.030686861564777068,
+      "mass_residual_relative": 1.6498483113076572e-12
+    },
+    "basic_pass": true,
+    "window_s": [
+      1.75,
+      2.0
+    ],
+    "stats": {
+      "dp20_50_pa": {
+        "mean": 23.645459016368143,
+        "min": 23.64545901573389,
+        "max": 23.645459017055643
+      },
+      "roi_mean_abs_wss_pa": {
+        "mean": 1.5559584145612648,
+        "min": 1.5559584145605372,
+        "max": 1.555958414561857
+      },
+      "roi_peak_abs_wss_pa": {
+        "mean": 1.5560011707275534,
+        "min": 1.556001170724386,
+        "max": 1.5560011707301329
+      },
+      "x030_flow_m2_s": {
+        "mean": 0.0012000672119787908,
+        "min": 0.0012000672119787368,
+        "max": 0.0012000672119788422
+      }
+    },
+    "reference": {
+      "pressure_pa": 23.625,
+      "wss_pa": 1.575,
+      "flow_m2_s": 0.0012
+    },
+    "analytical_errors_percent": {
+      "pressure": 0.08659901108207801,
+      "wss": 1.2089895516657179,
+      "flow": 0.005600998232568877,
+      "pressure_drift": 5.5947157547552944e-09
+    }
+  }
+}

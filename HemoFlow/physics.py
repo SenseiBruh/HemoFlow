@@ -1,4 +1,4 @@
-"""Keep the original circular-pipe references separate from the planar CFD."""
+"""Circular-pipe reference scales and planar-channel verification values."""
 import numpy as np
 
 
@@ -7,12 +7,12 @@ def calculate_reynolds_number(density, velocity, diameter, viscosity):
 
 
 def calculate_pressure_drop(viscosity, length, mean_velocity, diameter):
-    """Original healthy circular pipe reference, Pa; NOT a stenosis CFD result."""
+    """Steady healthy circular-pipe pressure difference (Pa), not stenotic CFD."""
     return 32 * viscosity * length * mean_velocity / diameter**2
 
 
 def calculate_wall_shear_stress(viscosity, mean_velocity, diameter):
-    """Original healthy circular pipe reference, Pa."""
+    """Steady healthy circular-pipe wall shear stress (Pa)."""
     return 8 * viscosity * mean_velocity / diameter
 
 

@@ -1,0 +1,13 @@
+{
+  "unit_tests_passed": 4,
+  "manufactured_analysis_pipeline_passed": true,
+  "smoke_cases": 3,
+  "smoke_duration_s": 0.002,
+  "smoke_threads": 2,
+  "resume_reused_all_cases": true,
+  "resume_note": "A stale test lock remained after the first process exited. Lock guard correctly rejected resume; after confirming process exit and removing stale lock, all cases reused.",
+  "frozen_files_verified": 17,
+  "export_integrity_passed": true,
+  "windows_launcher_executed": false,
+  "full_science_runs_executed": false
+}

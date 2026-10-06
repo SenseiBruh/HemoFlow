@@ -1,7 +1,8 @@
 """D2Q9 stress-regularized MRT lattice Boltzmann solver in physical units.
 
 Weakly compressible, Newtonian, rigid-wall planar model. Halfway bounce-back
-on the rasterized wall; Zou-He velocity inlet and fixed-density outlet.
+on the rasterized wall; velocity inlet and fixed-density outlet. Open ends
+use regularized stress extrapolation, with legacy Zou-He selectable.
 No synthetic swirl, stochastic body forces, or prescribed particle paths.
 """
 import math
@@ -10,6 +11,7 @@ from numba import njit
 from geometry import make_geometry, stenosis_report
 from kernel import advance as _advance_fast
 from kernel import advance_parallel
+from kernel import mass_inventory
 from physics import calculate_womersley_number, particle_relaxation_time, calculate_particle_stokes_number
 from waveform import pulse_value, pulse_curve, phase_label
 
@@ -87,12 +89,13 @@ class FlowSolver:
         # Nominal throat maximum <= 0.10 lattice units at peak inlet.
         # Keep actual Mach/density variation visible; never silently change viscosity.
         u_lattice = min(0.045, 0.10 * gap / (1.5 * (1 + config.pulsatility_percent / 100)))
+        u_lattice *= config.time_scale
         self.dt = u_lattice * self.dx / config.mean_velocity
         self.velocity_scale = self.dx / self.dt
         nu = config.viscosity / config.density * self.dt / self.dx**2
         self.tau = 0.5 + 3 * nu
         if self.tau < 0.501 or self.tau > 2.0:
-            raise ValueError(f"Unresolved viscosity/time scale (tau={self.tau:.5f}). Increase cells_across for high Re, or lower it for very viscous flow.")
+            raise ValueError(f"Unresolved viscosity/time scale (tau={self.tau:.5f}). Increase cells_across or time_scale if tau is below 0.501; reduce either if tau exceeds 2.")
         self.omega_p = 1 / self.tau
         self.iteration = 0
         self.kernel = _advance_fast
@@ -100,15 +103,30 @@ class FlowSolver:
         self.nodes = np.flatnonzero(g.fluid.ravel()).astype(np.int32)
         self.columns = self.nodes % self.nx
         rows = self.nodes // self.nx
-        self.sources = np.empty((len(self.nodes), 9), dtype=np.int32)
-        self.dirs = np.empty_like(self.sources)
+        sources = np.empty((len(self.nodes), 9), dtype=np.int32)
+        dirs = np.empty_like(sources)
         for k in range(9):
             sy, sx = rows - CY[k], self.columns - CX[k]
             valid = (sy >= 0) & (sy < self.ny) & (sx >= 0) & (sx < self.nx)
             source = np.clip(sy, 0, self.ny - 1) * self.nx + np.clip(sx, 0, self.nx - 1)
             bounce = ~valid | g.solid.ravel()[source]
-            self.sources[:, k] = np.where(bounce, self.nodes, source)
-            self.dirs[:, k] = np.where(bounce, OPP[k], k)
+            sources[:, k] = np.where(bounce, self.nodes, source)
+            dirs[:, k] = np.where(bounce, OPP[k], k)
+        # One population index replaces two indirect index loads per direction.
+        self.links = np.ascontiguousarray(sources * 9 + dirs, dtype=np.int32)
+        inside = (self.columns > 0) & (self.columns < self.nx - 1)
+        self.mass_nodes = self.nodes[inside]
+        outgoing = self.nodes[:, None] * 9 + OPP[None, :]
+        left = inside[:, None] & (sources % self.nx == 0)
+        right = inside[:, None] & (sources % self.nx == self.nx - 1)
+        self.left_in, self.left_out = self.links[left], outgoing[left]
+        self.right_in, self.right_out = self.links[right], outgoing[right]
+        self.column_counts = g.fluid.sum(axis=0)
+        self.low = np.argmax(g.fluid, axis=0)
+        self.high = self.ny - 1 - np.argmax(g.fluid[::-1], axis=0)
+        self.lower_slope = np.gradient(g.lower, self.dx)
+        self.upper_slope = np.gradient(g.upper, self.dx)
+        self.geometry_report = stenosis_report(config, g)
         # Flux-normalized discrete planar inlet: mean input is exact on this grid.
         parabolic = np.maximum(0, 1 - (2 * g.y / config.diameter)**2)
         parabolic[~g.fluid[:, 0]] = 0
@@ -152,11 +170,12 @@ class FlowSolver:
         if not isinstance(steps, int) or steps < 1:
             raise ValueError("steps must be a positive integer")
         c = self.config
-        self.f, self.other = self.kernel(self.f, self.other, self.nodes, self.sources, self.dirs,
+        self.f, self.other = self.kernel(self.f, self.other, self.nodes, self.links,
                                      self.columns, self.profile, self.nx, self.omega_p,
                                      self.rho, self.ux, self.uy, steps, self.iteration, self.dt,
                                      c.pulsatility_percent / 100, c.heart_rate / 60,
-                                     int(c.pulse_shape == "systolic"))
+                                     int(c.pulse_shape == "systolic"),
+                                     int(c.boundary_model == "regularized"))
         self.iteration += steps
 
     def set_threads(self, count):
@@ -175,14 +194,14 @@ class FlowSolver:
             return self.threads_used
         timings = {}
         c = self.config
-        for count in (1,2,4,8):
+        for count in (1,2,4,8,12,16):
             if count > numba.config.NUMBA_NUM_THREADS:
                 continue
             self.set_threads(count)
             f, other = self.f.copy(),self.other.copy()
             r,u,v = self.rho.copy(),self.ux.copy(),self.uy.copy()
-            args=(f,other,self.nodes,self.sources,self.dirs,self.columns,self.profile,self.nx,self.omega_p,
-                  r,u,v,24,0,self.dt,c.pulsatility_percent/100,c.heart_rate/60,int(c.pulse_shape=="systolic"))
+            args=(f,other,self.nodes,self.links,self.columns,self.profile,self.nx,self.omega_p,
+                  r,u,v,24,0,self.dt,c.pulsatility_percent/100,c.heart_rate/60,int(c.pulse_shape=="systolic"),int(c.boundary_model=="regularized"))
             self.kernel(*args)
             runs=[]
             for _ in range(3):
@@ -193,7 +212,43 @@ class FlowSolver:
         if timings[best] > .9*timings[1]:
             best=1
         self.set_threads(best)
+        self.thread_timings = timings
         return best
+
+    def numerics(self):
+        return dict(dx_m=self.dx, dt_s=self.dt, time_scale=self.config.time_scale,
+                    boundary_model=self.config.boundary_model,
+                    tau=self.tau, viscosity_pa_s=self.config.viscosity,
+                    kinematic_viscosity_m2_s=self.config.viscosity/self.config.density,
+                    lattice_sound_speed_m_s=self.velocity_scale/math.sqrt(3),
+                    grid=[self.nx, self.ny], fluid_cells=len(self.nodes),
+                    compute_threads=self.threads_used,
+                    pressure_station_x_m=[float(self.geometry.x[1]), float(self.geometry.x[-2])],
+                    mass_control_volume_faces_x_m=[float(self.dx/2), float(self.geometry.x[-1]-self.dx/2)])
+
+    def mass_balance(self):
+        """Exact discrete last-step balance on interior columns 1 through nx-2.
+
+        The boundary fluxes are crossing lattice populations at cell faces,
+        not interpolated nodal rho*u. This independently measures flux and
+        storage, including weak compressibility. It is not an accuracy test
+        for the incompressible physical model.
+        """
+        mass, change = mass_inventory(self.f, self.other, self.mass_nodes)
+        previous = self.other.ravel()
+        conversion = self.config.density * self.dx**2 / self.dt
+        inlet = float(np.sum(previous[self.left_in] - previous[self.left_out])) * conversion
+        outlet = float(np.sum(previous[self.right_out] - previous[self.right_in])) * conversion
+        storage = float(change) * conversion
+        residual = inlet - outlet - storage
+        reference = self.config.density * self.config.mean_velocity * self.config.diameter
+        return dict(fluid_mass_per_depth_kg_m=float(self.rho[self.nodes].sum()*self.config.density*self.dx**2),
+                    control_volume_mass_per_depth_kg_m=float(mass*self.config.density*self.dx**2),
+                    link_inlet_mass_flux_kg_m_s=inlet, link_outlet_mass_flux_kg_m_s=outlet,
+                    mass_storage_rate_kg_m_s=storage,
+                    mass_balance_residual_kg_m_s=residual,
+                    mass_balance_relative=residual/reference,
+                    mass_balance_valid=bool(self.iteration > 0))
 
     def fields(self):
         shape = (self.ny, self.nx)
@@ -207,17 +262,15 @@ class FlowSolver:
         u, v, p, vort = self.fields()
         g = self.geometry
         mask = g.fluid
-        count = mask.sum(axis=0)
+        count = self.column_counts
         mean_u = (u * mask).sum(axis=0) / count
         mean_p = (p * mask).sum(axis=0) / count
         # Approximate wall-tangent shear using first fluid node and half-cell
         # distance to the staircase bounce-back boundary. Curved-wall WSS needs
         # resolution convergence; this estimate is deliberately labeled.
-        low = np.argmax(mask, axis=0)
-        high = self.ny - 1 - np.argmax(mask[::-1], axis=0)
+        low, high = self.low, self.high
         ix = np.arange(self.nx)
-        lower_slope = np.gradient(g.lower, self.dx)
-        upper_slope = np.gradient(g.upper, self.dx)
+        lower_slope, upper_slope = self.lower_slope, self.upper_slope
         tangential_low = (u[low, ix] + lower_slope * v[low, ix]) / np.sqrt(1 + lower_slope**2)
         tangential_high = (u[high, ix] + upper_slope * v[high, ix]) / np.sqrt(1 + upper_slope**2)
         wss_low = 2 * self.config.viscosity * tangential_low / self.dx
@@ -227,10 +280,19 @@ class FlowSolver:
         interior = mask.copy()
         interior[:, :2] = interior[:, -2:] = False
         wss_abs = np.concatenate((np.abs(wss_low), np.abs(wss_high)))
+        min_y, min_x = np.unravel_index(np.argmin(np.where(interior, u, np.inf)), u.shape)
+        wss_index = int(np.argmax(wss_abs))
+        wss_wall, wss_x = divmod(wss_index, self.nx)
+        density_y, density_x = np.unravel_index(
+            np.argmax(np.where(mask, np.abs(self.rho.reshape(mask.shape)-1), -np.inf)), mask.shape)
         pulse = float(pulse_curve(self.config, np.asarray([self.time]))[0])
         particle_tau = particle_relaxation_time(
             self.config.particle_density_kg_m3, self.config.particle_diameter_um * 1e-6,
             self.config.viscosity)
+        q_in, q_out = float(mean_u[1]*count[1]*self.dx), float(mean_u[-2]*count[-2]*self.dx)
+        rho_grid = self.rho.reshape(mask.shape)
+        mass_in = float(np.sum(rho_grid[:, 1]*u[:, 1]*mask[:, 1])*self.config.density*self.dx)
+        mass_out = float(np.sum(rho_grid[:, -2]*u[:, -2]*mask[:, -2])*self.config.density*self.dx)
         return dict(u=u, v=v, p=p, vorticity=vort, mean_u=mean_u, mean_p=mean_p,
                     wss_low=wss_low, wss_high=wss_high,
                     delta_p=float(mean_p[1] - mean_p[-2]),
@@ -241,10 +303,19 @@ class FlowSolver:
                     density_variation=float(np.max(np.abs(self.rho[self.nodes] - 1))),
                     flux_error=float((mean_u[1] * count[1] - mean_u[-2] * count[-2]) /
                                      max(abs(mean_u[1] * count[1]), 1e-12)),
+                    volume_flux_mismatch_relative=(q_in-q_out)/max(abs(q_in),1e-12),
+                    inlet_flow_per_depth_m2_s=q_in, outlet_flow_per_depth_m2_s=q_out,
+                    inlet_mass_flux_per_depth_kg_m_s=mass_in,
+                    outlet_mass_flux_per_depth_kg_m_s=mass_out,
                     pulse_factor=pulse,
                     phase=phase_label(self.config, self.time),
                     inlet_speed=float(self.config.mean_velocity * pulse),
                     max_wss=float(np.nanmax(wss_abs)),
+                    max_wss_x_mm=float(1000*g.x[wss_x]),
+                    max_wss_wall_index=wss_wall,
+                    min_u_x_mm=float(1000*g.x[min_x]), min_u_y_mm=float(1000*g.y[min_y]),
+                    max_density_x_mm=float(1000*g.x[density_x]),
+                    max_density_y_mm=float(1000*g.y[density_y]),
                     mean_abs_wss=float(np.nanmean(wss_abs)),
                     max_vorticity=float(np.nanmax(np.abs(vort[mask]))),
                     womersley=float(calculate_womersley_number(
@@ -254,7 +325,8 @@ class FlowSolver:
                     particle_stokes_number=float(calculate_particle_stokes_number(
                         self.config.particle_density_kg_m3, self.config.particle_diameter_um * 1e-6,
                         self.config.viscosity, self.config.heart_rate)),
-                    geometry_report=stenosis_report(self.config, g))
+                    geometry_report=self.geometry_report,
+                    **self.mass_balance())
 
     def check_stability(self):
         r = self.rho[self.nodes]

@@ -1,0 +1,54 @@
+{
+  "source": "prior_evidence/RESULTS.md in HemoFlow_Project_Source.zip",
+  "source_sha256": "aae1510c144a6d9f515ac42dfec10c1d4baa86c93474e8fcd513a154568f9d00",
+  "cases": [
+    {
+      "case": "healthy_steady_base_N080_dt0750",
+      "status": "completed",
+      "gate_pass": true,
+      "failure_reason": ""
+    },
+    {
+      "case": "healthy_steady_revised_N080_dt0750",
+      "status": "completed",
+      "gate_pass": true,
+      "failure_reason": ""
+    },
+    {
+      "case": "healthy_pulse_base_N080_dt0750",
+      "status": "completed",
+      "gate_pass": true,
+      "failure_reason": ""
+    },
+    {
+      "case": "healthy_pulse_revised_N080_dt0750",
+      "status": "completed",
+      "gate_pass": true,
+      "failure_reason": ""
+    },
+    {
+      "case": "healthy_pulse_base_N080_dt0300",
+      "status": "completed",
+      "gate_pass": true,
+      "failure_reason": ""
+    },
+    {
+      "case": "healthy_pulse_revised_N080_dt0300",
+      "status": "completed",
+      "gate_pass": true,
+      "failure_reason": ""
+    },
+    {
+      "case": "D75_pilot_base_N080_dt0300",
+      "status": "completed",
+      "gate_pass": false,
+      "failure_reason": "cycle repeatability: 60.0272% >= 1%"
+    },
+    {
+      "case": "D75_pilot_revised_N080_dt0300",
+      "status": "completed",
+      "gate_pass": false,
+      "failure_reason": "cycle repeatability: 53.7637% >= 1%"
+    }
+  ]
+}

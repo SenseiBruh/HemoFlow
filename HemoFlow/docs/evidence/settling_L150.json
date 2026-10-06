@@ -1,0 +1,47 @@
+{
+  "cycles": 10,
+  "comparison_count": 9,
+  "last_three_transitions": [
+    {
+      "cycle": 8,
+      "reference_cycle": 7,
+      "dp20_50_pa_l2_percent": 0.0001568474617609241,
+      "roi_mean_abs_wss_pa_l2_percent": 0.0001280952792533294,
+      "roi_peak_abs_wss_pa_l2_percent": 3.6745417639533005e-05,
+      "x030_flow_m2_s_l2_percent": 2.9784635027632277e-05,
+      "signed_wss_full_l2_percent": 0.008568751152735029,
+      "signed_wss_throat_l2_percent": 0.0005837572845802819,
+      "signed_wss_downstream_l2_percent": 0.018845037307262877,
+      "signed_wss_far_l2_percent": 0.0392639531636298
+    },
+    {
+      "cycle": 9,
+      "reference_cycle": 8,
+      "dp20_50_pa_l2_percent": 0.0001572950128043623,
+      "roi_mean_abs_wss_pa_l2_percent": 0.00012824173044852675,
+      "roi_peak_abs_wss_pa_l2_percent": 3.674369987711631e-05,
+      "x030_flow_m2_s_l2_percent": 2.978420545452994e-05,
+      "signed_wss_full_l2_percent": 0.008569039490788624,
+      "signed_wss_throat_l2_percent": 0.0005834872126643278,
+      "signed_wss_downstream_l2_percent": 0.01884571083393805,
+      "signed_wss_far_l2_percent": 0.03926539564623925
+    },
+    {
+      "cycle": 10,
+      "reference_cycle": 9,
+      "dp20_50_pa_l2_percent": 0.000156797035473671,
+      "roi_mean_abs_wss_pa_l2_percent": 0.00012893535955900922,
+      "roi_peak_abs_wss_pa_l2_percent": 3.674368140711429e-05,
+      "x030_flow_m2_s_l2_percent": 2.9784136432456104e-05,
+      "signed_wss_full_l2_percent": 0.008569582363292307,
+      "signed_wss_throat_l2_percent": 0.0005835329397582142,
+      "signed_wss_downstream_l2_percent": 0.018846900715612402,
+      "signed_wss_far_l2_percent": 0.03926823773261208
+    }
+  ],
+  "worst_last_three_l2_percent": 0.03926823773261208,
+  "threshold_percent": 1.0,
+  "recorded_observables_repeatable": true,
+  "solver_validated": false,
+  "scope": "Pressure, flow and signed WSS in fixed regions only; does not prove the entire field is periodic or grid independent."
+}

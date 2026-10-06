@@ -1,0 +1,164 @@
+{
+  "created_utc": "2026-09-29T18:01:01.494089+00:00",
+  "scope": "Repository organization and software regression checks; not physical validation.",
+  "environment": {
+    "python": "3.12.14",
+    "os": "Linux",
+    "threads": 2,
+    "packages": {
+      "numpy": "2.3.5",
+      "matplotlib": "3.10.8",
+      "numba": "0.67.0",
+      "llvmlite": "0.49.0"
+    }
+  },
+  "checks": [
+    {
+      "name": "desktop_executable_ast_unchanged",
+      "passed": true,
+      "python_files": 15,
+      "documentation_only_changes": [
+        "physics.py",
+        "provenance.py",
+        "config.py"
+      ],
+      "mismatches": []
+    },
+    {
+      "name": "length_confirmation_frozen_hashes",
+      "passed": true,
+      "files": 17,
+      "mismatches": []
+    },
+    {
+      "name": "length_confirmation_python_bytes_unchanged",
+      "passed": true,
+      "python_files": 31,
+      "mismatches": []
+    },
+    {
+      "name": "grid_refinement_frozen_hashes",
+      "passed": true,
+      "files": 17,
+      "mismatches": []
+    },
+    {
+      "name": "grid_refinement_python_bytes_unchanged",
+      "passed": true,
+      "python_files": 34,
+      "mismatches": []
+    },
+    {
+      "name": "desktop_unittests",
+      "passed": true,
+      "return_code": 0,
+      "elapsed_s": 7.963,
+      "tests": 23
+    },
+    {
+      "name": "length_confirmation_unittests",
+      "passed": true,
+      "return_code": 0,
+      "elapsed_s": 0.467,
+      "tests": 4
+    },
+    {
+      "name": "length_confirmation_plan_only",
+      "passed": true,
+      "return_code": 0,
+      "elapsed_s": 0.431,
+      "tests": null
+    },
+    {
+      "name": "length_confirmation_plan_count",
+      "passed": true,
+      "cases": 3
+    },
+    {
+      "name": "grid_refinement_unittests",
+      "passed": true,
+      "return_code": 0,
+      "elapsed_s": 0.47,
+      "tests": 8
+    },
+    {
+      "name": "grid_refinement_plan_only",
+      "passed": true,
+      "return_code": 0,
+      "elapsed_s": 0.42,
+      "tests": null
+    },
+    {
+      "name": "grid_refinement_plan_count",
+      "passed": true,
+      "cases": 6
+    },
+    {
+      "name": "manufactured_grid_analysis_pipeline",
+      "passed": true,
+      "return_code": 0,
+      "elapsed_s": 0.546,
+      "tests": null
+    },
+    {
+      "name": "desktop_help",
+      "passed": true,
+      "return_code": 0,
+      "elapsed_s": 0.158,
+      "tests": null
+    },
+    {
+      "name": "desktop_headless_recording",
+      "passed": true,
+      "return_code": 0,
+      "elapsed_s": 1.941,
+      "tests": null
+    },
+    {
+      "name": "desktop_recording_artifacts",
+      "passed": true
+    },
+    {
+      "name": "recording_summary_csv",
+      "passed": true,
+      "return_code": 0,
+      "elapsed_s": 0.484,
+      "tests": null
+    },
+    {
+      "name": "offscreen_viewer",
+      "passed": true,
+      "return_code": 0,
+      "elapsed_s": 3.008,
+      "tests": null
+    },
+    {
+      "name": "study_git_index_preserves_bytes_with_autocrlf",
+      "passed": true,
+      "files": 78,
+      "differences": []
+    },
+    {
+      "name": "gitignore_excludes_generated_data",
+      "passed": true
+    },
+    {
+      "name": "documentation_relative_links",
+      "passed": true,
+      "broken": []
+    }
+  ],
+  "all_passed": true,
+  "not_executed": [
+    "Windows batch launchers",
+    "Interactive Windows frame-rate measurement",
+    "Full length-confirmation study",
+    "Full grid-refinement study",
+    "Physical validation"
+  ],
+  "notes": [
+    "Existing Windows study directories were not accessed or modified.",
+    "Offscreen rendering does not establish GUI performance on the user's PC.",
+    "Only comments/docstrings changed in root Python files; study Python was byte-preserved."
+  ]
+}

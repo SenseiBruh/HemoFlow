@@ -14,6 +14,7 @@ import secrets
 import sys
 import time
 from config import Config
+from provenance import VERSION
 from physics import calculate_pressure_drop, calculate_wall_shear_stress, calculate_womersley_number, classify_flow
 
 
@@ -48,6 +49,7 @@ def interactive(config):
         ("particle_density_kg_m3", "Particle density (kg/m^3)"),
         ("particle_display_limit", "Maximum particles drawn (0 = all)"),
         ("max_random_plaques", "Maximum random plaques (1-3)"),
+        ("time_scale", "Numerical time scale (0.1-1; lower Mach, more time steps)"),
         ("compute_threads", "Solver threads (0 = automatic)")]
     values = {}
     for key, label in fields:
@@ -74,6 +76,7 @@ def headless(config, seconds, output, record_dir=None, record_every=.05,
     import numpy as np
     from solver import FlowSolver
     from recorder import RunRecorder
+    from provenance import run_manifest
     if cycles < 0 or (not isinstance(cycles, int)):
         raise ValueError("--cycles must be a non-negative integer")
     if cycles:
@@ -83,14 +86,22 @@ def headless(config, seconds, output, record_dir=None, record_every=.05,
     if not continuous and (not math.isfinite(seconds) or seconds <= 0):
         raise ValueError("--seconds must be finite and positive")
     solver = FlowSolver(config)
+    print("Selecting CPU thread count (or applying --threads)...", flush=True)
+    solver.tune_threads()
+    print(f"Using {solver.threads_used} CPU thread(s); dt={solver.dt:.6g} s; tau={solver.tau:.6f}; time scale={config.time_scale:g}", flush=True)
     target = math.ceil(seconds / solver.dt) if not continuous else None
     recorder = RunRecorder(record_dir, record_every) if record_dir else None
     started = time.perf_counter()
     next_report = started + 5
     stopped_by_user = False
     try:
+        if recorder is not None:
+            recorder.record(solver, solver.diagnostics(), 0, None)
         while target is None or solver.iteration < target:
             steps = min(200, target - solver.iteration) if target is not None else 200
+            if recorder is not None:
+                sample_step = math.ceil((recorder.next_time(0) - 1e-12) / solver.dt)
+                steps = min(steps, max(1, sample_step - solver.iteration))
             solver.step(steps)
             solver.check_stability()
             if recorder is not None and recorder.due(0, solver.time):
@@ -98,13 +109,16 @@ def headless(config, seconds, output, record_dir=None, record_every=.05,
             now = time.perf_counter()
             if now >= next_report:
                 suffix = " (continuous; Ctrl+C to stop)" if target is None else ""
-                print(f"Simulated {solver.time:.3f} s{suffix}", flush=True)
+                rate = solver.time / max(now - started, 1e-9)
+                eta = "" if target is None else f"; approx {(target*solver.dt-solver.time)/max(rate,1e-12)/60:.1f} min remaining"
+                print(f"Simulated {solver.time:.3f} s ({rate:.4f} simulated s / wall s){eta}{suffix}", flush=True)
                 next_report = now + 5
     except KeyboardInterrupt:
         stopped_by_user = True
         print(f"Stopping after {solver.time:.3f} simulated seconds; writing final exports.", flush=True)
     finally:
         if recorder is not None:
+            recorder.record(solver, solver.diagnostics(), 0, None, force=True)
             recorder.close()
     d, g = solver.diagnostics(), solver.geometry
     output = Path(output)
@@ -126,6 +140,7 @@ def headless(config, seconds, output, record_dir=None, record_every=.05,
         metrics["recording"] = recorder.paths
         (output / "metrics.json").write_text(json.dumps(metrics, indent=2)+"\n", encoding="utf-8")
     config.save(output / "settings.json")
+    (output / "run_manifest.json").write_text(json.dumps(run_manifest(solver), indent=2)+"\n", encoding="utf-8")
     print(json.dumps(metrics, indent=2))
 
 
@@ -139,6 +154,10 @@ def main():
     parser.add_argument("--bpm", "--heart-rate", dest="heart_rate", type=float, help="Fixed heart rate in BPM")
     parser.add_argument("--cells", type=int, help="Grid cells across the unobstructed vessel")
     parser.add_argument("--threads", type=int, help="Solver threads (0 = automatic)")
+    parser.add_argument("--time-scale", type=float, help="0.1-1: smaller reduces lattice Mach at fixed physical inputs (default 0.5; v3 used 1)")
+    parser.add_argument("--boundary-model", choices=["regularized", "zou_he"],
+                        help="Open-end boundary reconstruction; zou_he reproduces v3.1")
+    parser.add_argument("--fps", type=int, help="Viewer target frame rate, 10-60 (does not change physics)")
     parser.add_argument("--pulse-shape", choices=["sine", "systolic"], help="Inlet waveform shape")
     parser.add_argument("--steady", action="store_true", help="Disable the heartbeat modulation")
     parser.add_argument("--particle-model", choices=["tracer", "inertial"], help="One-way particle model")
@@ -164,6 +183,8 @@ def main():
     overrides = {}
     for attr, value in (("geometry_mode", args.mode), ("seed", args.seed), ("cells_across", args.cells),
                         ("compute_threads", args.threads), ("pulse_shape", args.pulse_shape),
+                        ("time_scale", args.time_scale), ("viewer_fps", args.fps),
+                        ("boundary_model", args.boundary_model),
                         ("heart_rate", args.heart_rate), ("particle_model", args.particle_model),
                         ("particle_diameter_um", args.particle_diameter_um),
                         ("particle_density_kg_m3", args.particle_density),
@@ -181,7 +202,7 @@ def main():
     # run reproducible, and custom layouts are never replaced by this step.
     if config.randomize_on_launch and args.seed is None and not args.interactive and config.geometry_mode == "random":
         config = replace(config, seed=secrets.randbelow(2**32)).validate()
-    print("\nHemoFlow | continuous 2D flow\n", flush=True)
+    print(f"\nHemoFlow v{VERSION} | continuous 2D flow\n", flush=True)
     print(f"Reynolds number: {config.reynolds:.1f} | {classify_flow(config.reynolds)}")
     print(f"Fixed heart rate: {config.heart_rate:g} BPM | Womersley comparison α: "
           f"{calculate_womersley_number(config.density, config.heart_rate, config.diameter, config.viscosity):.2f}")
