@@ -1,0 +1,21 @@
+{
+  "required": [
+    "healthy_steady_base_N080_dt0750",
+    "healthy_steady_candidate_N080_dt0750",
+    "healthy_pulse_base_N080_dt0750",
+    "healthy_pulse_candidate_N080_dt0750",
+    "healthy_pulse_base_N080_dt0300",
+    "healthy_pulse_candidate_N080_dt0300"
+  ],
+  "missing_or_incomplete": [],
+  "failed_gates": [
+    "healthy_pulse_candidate_N080_dt0750",
+    "healthy_pulse_candidate_N080_dt0300"
+  ],
+  "all_required_cases_pass": false,
+  "all_pair_comparisons_pass": true,
+  "ready_for_broad_severity_study": false,
+  "scope": "Passing these short checks does not establish grid independence or physical validation.",
+  "acoustic_candidate_pass": true,
+  "pilots_eligible": false
+}

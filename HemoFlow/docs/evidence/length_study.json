@@ -1,0 +1,107 @@
+{
+  "version": "length-confirmation-2026-09-28.1",
+  "created": "20260928T041653_008946Z",
+  "cases": [
+    {
+      "key": "healthy_L150",
+      "kind": "healthy",
+      "cells": 80,
+      "length_mm": 150,
+      "dt_s": 1.5e-06,
+      "epsilon": 0.0,
+      "cycles": null,
+      "duration_s": 2.0,
+      "initialization": "native"
+    },
+    {
+      "key": "severe_L120",
+      "kind": "severe",
+      "cells": 80,
+      "length_mm": 120,
+      "dt_s": 3e-07,
+      "epsilon": 0.001,
+      "cycles": 10,
+      "duration_s": 8.333333333333334,
+      "initialization": "native"
+    },
+    {
+      "key": "severe_L150",
+      "kind": "severe",
+      "cells": 80,
+      "length_mm": 150,
+      "dt_s": 3e-07,
+      "epsilon": 0.001,
+      "cycles": 10,
+      "duration_s": 8.333333333333334,
+      "initialization": "native"
+    }
+  ],
+  "threads": 16,
+  "smoke": false,
+  "source_hashes": {
+    "audit_math.py": "0a6afdb1657a41861022c1658c1f18050cff5787efb90382d1e53cf5c1492b93",
+    "case_runtime.py": "7350fcf6dd661c684e0964947bda06eda8b387cbc947dfd85635d3133c9d9e90",
+    "experiment.py": "b060c348883ff8ee5c42393774dc7e9ead82ca1d1d45af52e5fd0325f6c9057a",
+    "FROZEN_SOURCE.json": "d723782ca0f1e2fb2e8e00d37156df8c2f0489d2beb17b09f2014143636989fb",
+    "jet_analysis.py": "7d943ae2ce3ba422f8959d0345d9aae4585eeb17b1558c4f27f04884bf961891",
+    "measurements.py": "f570daaee7580d42aa13cd8027b367185fd4be20815bca5240a6dd082f351e1e",
+    "README.md": "859fe849abed2261571c280bec2601ff1e22f74a47077de9cbbc1fbcad230346",
+    "requirements.txt": "98c8cd84b25a0eb46f032efe28c77a82955ba3b905869d39ccb721377215f19b",
+    "run_length_confirmation.py": "721360c47d52786d9c91216fd5d9d238bd9b72fa7deaa4104c81c73a62c9ffa8",
+    "safe_export.py": "140373d17a80c99f9f5f79559abe4e1818d92f55a6ea5085e024110c72ea329e",
+    "sequence_analysis.py": "e997835742938d40515b2129f416ad7013ffe70f836609bc0e01ca243cf440f6",
+    "sequence_support.py": "82b25f4767063403e2cf166384006e821678c1674de8b84a50ae097169df82ad",
+    "settling_analysis.py": "c4d5f784a60229c5173b54efc61ac915f96de4601b7a5d52612446676e78de70",
+    "source_frozen/analyze_recording.py": "7a7565c434cefff5197f0fbc2a9ca744cf25ccc2942cef9c2df4792d989ee193",
+    "source_frozen/benchmark.py": "c4b1856e0f013329591184af31f1e80f0c0307594304d9f20dfca158e9fa5248",
+    "source_frozen/config.py": "bbcb34ec287372fc9610f31f95aca91674f17febbd803e330fa2f25c997b7ca5",
+    "source_frozen/engine.py": "7d9703dfb66ed6b14cdd38ef4135c5ca955efae66e150c89479427b3503bce6f",
+    "source_frozen/geometry.py": "b55d6b0eb42393a2c97bbf2415b746c7f5a7d3415697bb73bbe19281b1507ff6",
+    "source_frozen/kernel.py": "a1e5097ce6f37a1733b22acfc1ba139ed0a7459c0c2dd10943439e9a4a09b38a",
+    "source_frozen/main.py": "a36b7e1dab0e18db912cc84a12a99a6d3285ae739eb58fe03987f64b871ebdd7",
+    "source_frozen/outlet_candidate.py": "5b098768834a9ea704007481e855a828f6855aa07bf933b18a5557f9b7dbce6f",
+    "source_frozen/outlet_section.py": "f701a315f72b93e045979bfed8926fc9486ecd7093a9f2d95d32f967d7c78e03",
+    "source_frozen/particles.py": "e818cc28d2f66dec58f4b8f61df1b41a3f09ba719f7919ae7ce59db52c468349",
+    "source_frozen/physics.py": "957fb6405e17fe63d8380cc4ca6559019b47656e0047649fd9ebd5309787e578",
+    "source_frozen/provenance.py": "3026c3d48256e5f2a6d71de14a2e650d9f8b61aac91a7ddb5d40578a30b4f378",
+    "source_frozen/recorder.py": "ea7e27320056e792726aa0c46acad33a50aaa9a265ead4389fc0054a9c6f9421",
+    "source_frozen/rendering.py": "9433967e61f860ac48cb13da9ebde81346b1e8288142b5fcec6df925eb821694",
+    "source_frozen/solver.py": "f4af64d35987d962756e54d5c8d1bf3e268cdfba8c174060712c864709aeb1f9",
+    "source_frozen/visualization.py": "4d50f2aa686e0c88e5902b6b0f0f383fc85b5f797cff4357407d7da6414f58a0",
+    "source_frozen/waveform.py": "530b023a4076a3a4d99dc5a5b3de5100495d1bde7dad5aec8f7841d3bc01b0d9",
+    "START_TESTS.cmd": "5fb29094b0b7b8b9f38aa2286e8f8f2788c59974220ed6e4df8009f9f6b8b7f1",
+    "startup_analysis.py": "930318a0913490ab6fcb69ab0be6bd7db7da2552dc288d72fa4d216511f52645",
+    "startup_controls.py": "879ecd7692658986695f260fc1c411e76e1b044e5fed8a976fa79e9acb1ec3ab",
+    "strict_analysis.py": "c740532678f68fc6eac0b3d6c800c99aaf41b00a15d975119ad91e2c6dc3b489",
+    "test_settling.py": "3a9e208c4138d5daa07df1fd039bb9e8144da3243b34f1e86b010123a4a93eb2"
+  },
+  "purpose": "Cycle repeatability and downstream-length sensitivity; fixed solver/outlet; not physical validation.",
+  "sampling": "50 microseconds through 20 ms; 250 microseconds thereafter; actual solver times recorded.",
+  "onset_thresholds_m_s": [
+    1e-09,
+    1e-06,
+    0.001
+  ],
+  "comparison_windows_s": [
+    [
+      0.0,
+      0.02
+    ],
+    [
+      0.02,
+      0.1
+    ],
+    [
+      0.1,
+      0.3
+    ],
+    [
+      0.3,
+      0.8
+    ],
+    [
+      0.8,
+      1.6
+    ]
+  ]
+}

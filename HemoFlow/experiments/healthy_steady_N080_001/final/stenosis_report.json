@@ -1,9 +1,0 @@
-{
-  "model": "2D planar rasterized lumen; area value is a circular-3D equivalent",
-  "nominal_diameter_mm": 4.0,
-  "grid_spacing_mm": 0.05,
-  "overall_minimum_lumen_mm": 4.0,
-  "overall_realized_raster_diameter_narrowing_percent": 0.0,
-  "overall_equivalent_circular_3d_area_reduction_percent": 0.0,
-  "plaques": []
-}

@@ -22,9 +22,8 @@ class Config:
     geometry_mode: str = "random"
     cells_across: int = 40
     particle_count: int = 1000
-    # Particle properties are one-way probes: they do not alter the blood
-    # solution.  ``tracer`` follows the solved velocity exactly; ``inertial``
-    # adds a Stokes relaxation time so size/density sweeps are meaningful.
+    # One-way particle probes do not affect the fluid solution. Tracers
+    # follow the velocity field; inertial particles use Stokes relaxation.
     particle_model: str = "tracer"
     particle_diameter_um: float = 8.0
     particle_density_kg_m3: float = 1060.0
@@ -32,12 +31,17 @@ class Config:
     particle_display_limit: int = 650
     pulse_shape: str = "systolic"
     randomize_count: bool = True
-    # The default layout stays readable: one or two plaques. Three is still
-    # available as an explicit advanced setting.
+    # Random layouts contain one or two plaques by default; three is optional.
     max_random_plaques: int = 2
     randomize_on_launch: bool = True
     plaques: list | None = None
     compute_threads: int = 0
+    # Reduces lattice Mach/acoustic compressibility at fixed physical inputs.
+    # 1.0 reproduces v3 scaling; 0.5 uses twice as many physical time steps.
+    time_scale: float = 0.5
+    # Open-end stress extrapolation; Zou-He remains for baseline reproduction.
+    boundary_model: str = "regularized"
+    viewer_fps: int = 45
 
     @property
     def diameter(self):
@@ -89,6 +93,12 @@ class Config:
             raise ValueError("max_random_plaques must be 1, 2, or 3.")
         if type(self.compute_threads) is not int or not 0 <= self.compute_threads <= 32:
             raise ValueError("compute_threads must be an integer from 0 (auto) to 32.")
+        if not math.isfinite(self.time_scale) or not 0.1 <= self.time_scale <= 1.0:
+            raise ValueError("time_scale must be between 0.1 and 1.0 (smaller = lower Mach, slower).")
+        if self.boundary_model not in ("regularized", "zou_he"):
+            raise ValueError("boundary_model must be regularized or zou_he.")
+        if type(self.viewer_fps) is not int or not 10 <= self.viewer_fps <= 60:
+            raise ValueError("viewer_fps must be an integer from 10 to 60.")
         if self.geometry_mode == "custom" and (not isinstance(self.plaques, list) or len(self.plaques) > 12):
             raise ValueError("Custom geometry needs a list of up to 12 plaques.")
         if self.length < 4 * self.diameter:

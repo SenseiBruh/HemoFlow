@@ -1,0 +1,32 @@
+{
+  "prepared": "2026-10-05",
+  "scope": "Selected original summary files, plus a transcribed outlet-case table. No scientific rerun.",
+  "archives": [
+    {
+      "name": "HemoFlow_Project_Source.zip",
+      "sha256": "f7d95ce9f92876b5fe8726f5aaae90c2d652e50b8a2b678eb93147230aeae2c7"
+    },
+    {
+      "name": "UPLOAD_SETTLING_SUMMARY_20260928T030831_947348Z_d1616f9d.zip",
+      "sha256": "e796c17ffcd22764b81741466815f96794d11345b8af66d8493c4ed8c963b893"
+    },
+    {
+      "name": "UPLOAD_LENGTH_SUMMARY_20260928T194227_229800Z_94f92f78.zip",
+      "sha256": "77febc6fcf3341a7bb7c4cd69304a11ffb0ea527e23054027b6424effd9b3abc"
+    }
+  ],
+  "evidence_sha256": {
+    "domain_090_120.json": "c313ca53d5136c5322bdf7351cd83267dc478b47f4f930fbbdc827280b0ee659",
+    "domain_120_150.json": "4839ce1728d090455fcc02808c133adeb8c3f3aad808099f718df86d7d0df77d",
+    "earlier_outlet_readiness.json": "46bfdda7c92f07276331bdf66501ee642b295e8ffd10cc9258b4caeeebc62f81",
+    "healthy_L150.json": "da8bbee0e7c90f84d476f3b8240a9fbea1fc3b2765fc6abfd17d9840390e6964",
+    "length_study.json": "a232fab95555c99d3e7e03de34ee589cfb6e84973bc51dd7154177b31a36ec99",
+    "outlet_revision_cases.json": "16cbb287db288821d43ba6fb873934ddc55a369b428a21a46cea36949d2c93b0",
+    "outlet_revision_pilot_comparison.json": "e84998561680fccdb82589c6818769ccf369a8a8544e508b0da225719dc30b53",
+    "outlet_revision_readiness.json": "e8b0dc5f23e6878b3db5a00a41ea3ea42e014971d90b6414a7cd123c72457bb0",
+    "settling_L090.json": "94b9efe0d413f6ccd975322b9a0ce6d4a3f24c6ede5b1304d074f1c286ed120d",
+    "settling_L120.json": "cb698f5be1760d164f82b1fba3fb9f8efe006facb039bb5e973ff6748c7d7779",
+    "settling_L150.json": "b7e01663d4dbbb0c6963e4eabe7114185ae84752d6572c416df56db9cf9d2d88",
+    "wall_audit_summary.json": "9fe98b83cb18d274af86f133033f8da735bd4006e27a860aa69666c73e6f07d9"
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "case": "D75_pilot_revised_N080_dt0300",
+  "reference": "D75_pilot_base_N080_dt0300",
+  "kind": "outlet",
+  "window_s": [
+    0.8333333333333334,
+    2.5
+  ],
+  "metrics": [
+    {
+      "metric": "dp20_50_pa",
+      "statistic": "mean",
+      "value": 1009.6791703557295,
+      "reference_value": 1010.4775560015187,
+      "difference_percent": -0.07901072528007277,
+      "limit_percent": 2.0,
+      "passed": true
+    },
+    {
+      "metric": "roi_mean_abs_wss_pa",
+      "statistic": "mean",
+      "value": 4.6012257918414,
+      "reference_value": 4.741720709357617,
+      "difference_percent": -2.9629521881994316,
+      "limit_percent": 5.0,
+      "passed": true
+    },
+    {
+      "metric": "roi_peak_abs_wss_pa",
+      "statistic": "max",
+      "value": 66.36945948244852,
+      "reference_value": 66.74180865798442,
+      "difference_percent": -0.5578949432491255,
+      "limit_percent": 10.0,
+      "passed": true
+    },
+    {
+      "metric": "x030_flow_m2_s",
+      "statistic": "mean",
+      "value": 0.001200158917518423,
+      "reference_value": 0.001200158933558522,
+      "difference_percent": -1.3364978994087497e-06,
+      "limit_percent": 1.0,
+      "passed": true
+    },
+    {
+      "metric": "dp20_50_pa",
+      "statistic": "waveform_l2_percent",
+      "value": 12.146152509597862,
+      "limit_percent": 5.0,
+      "passed": false
+    },
+    {
+      "metric": "x030_flow_m2_s",
+      "statistic": "waveform_l2_percent",
+      "value": 0.30353499621329405,
+      "limit_percent": 2.0,
+      "passed": true
+    },
+    {
+      "metric": "signed_wall_profiles",
+      "statistic": "space_time_l2_percent",
+      "value": 40.44011043036583,
+      "limit_percent": 10.0,
+      "passed": false
+    }
+  ],
+  "passed": false,
+  "profile_regions_l2_percent": {
+    "20_28mm": 0.6811222065525248,
+    "28_32mm": 0.461386580969565,
+    "32_40mm": 14.59274059570188,
+    "40_55mm": 82.10706592870996
+  },
+  "wall_swap_diagnostic_l2_percent": 72.37452900057967,
+  "wall_swap_note": "Orientation diagnostic only; never substitutes for the direct score or changes acceptance."
+}

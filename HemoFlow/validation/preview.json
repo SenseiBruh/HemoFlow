@@ -1,9 +1,0 @@
-{
-  "frames": 48,
-  "display_duration_s": 5.04,
-  "seed": 42,
-  "grid_cells_across": 24,
-  "particle_count": 360,
-  "pulse_shape": "systolic",
-  "source": "threaded Dashboard Agg capture"
-}
